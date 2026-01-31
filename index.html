@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preguntas para Retroalimentación</title>
+    <title>Preguntas de Retroalimentación</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Librería para exportar a Excel -->
-    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+    <!-- SheetJS para exportar a Excel -->
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -184,11 +184,11 @@
         }
 
         .btn-success {
-            background-color: var(--success);
+            background-color: #28a745;
         }
 
         .btn-success:hover {
-            background-color: #2da0c3;
+            background-color: #218838;
         }
 
         .btn-warning {
@@ -198,6 +198,15 @@
 
         .btn-warning:hover {
             background-color: #e0a800;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
         }
 
         .message {
@@ -358,13 +367,41 @@
         .password-input button {
             white-space: nowrap;
         }
+
+        .test-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-graduation-cap"></i> Preguntas de Retroalimentación</h1>
-            <p class="subtitle">Envía tus preguntas sobre las materias de Biología, Química o Lenguaje. Tus consultas serán guardadas y respondidas en el grupo de WhatsApp.</p>
+            <h1><i class="fas fa-graduation-cap"></i> Preguntas Académicas</h1>
+            <p class="subtitle">Envía tus preguntas sobre las materias de Biología, Química o Lenguaje. Tus consultas serán guardadas y respondidas por nuestros profesores.</p>
         </header>
 
         <div class="main-content">
@@ -405,6 +442,11 @@
                 <div id="errorMessage" class="message error-message">
                     <i class="fas fa-exclamation-triangle"></i> Hubo un error al guardar tu pregunta. Por favor, intenta nuevamente.
                 </div>
+
+                <div class="loading" id="loadingMessage">
+                    <div class="spinner"></div>
+                    <p>Guardando tu pregunta...</p>
+                </div>
             </div>
             
             <div class="card info-card">
@@ -431,7 +473,7 @@
             </div>
         </div>
         
-        <!-- Panel de Administración con Contraseña -->
+        <!-- Panel de Administración -->
         <div class="admin-panel">
             <div class="admin-header">
                 <h2><i class="fas fa-lock"></i> Panel de Administración</h2>
@@ -445,9 +487,12 @@
                     <h4><i class="fas fa-key"></i> Acceso Restringido</h4>
                     <p>Ingresa la contraseña de administrador para acceder a las preguntas:</p>
                     <div class="password-input">
-                        <input type="password" id="adminPassword" placeholder="Contraseña de administrador">
+                        <input type="password" id="adminPassword" placeholder="Contraseña: admin123">
                         <button class="btn" id="accessBtn">Acceder</button>
                     </div>
+                    <p style="margin-top: 10px; font-size: 0.9rem; color: #6c757d;">
+                        <i class="fas fa-info-circle"></i> Contraseña por defecto: <strong>admin123</strong>
+                    </p>
                 </div>
                 
                 <div id="adminDashboard" class="hidden">
@@ -467,28 +512,34 @@
                     </div>
                     
                     <div class="instructions">
-                        <h4><i class="fas fa-info-circle"></i> Instrucciones para descargar preguntas</h4>
+                        <h4><i class="fas fa-info-circle"></i> Funcionamiento del Sistema</h4>
                         <ul>
-                            <li>Las preguntas se guardan automáticamente en un archivo Excel con nombre aleatorio</li>
-                            <li>Cada pregunta nueva se agrega al archivo existente</li>
-                            <li>Para descargar todas las preguntas, haz clic en el botón "Descargar Excel"</li>
-                            <li>El archivo se descargará con un nombre encriptado para mayor seguridad</li>
+                            <li>Cada pregunta se guarda automáticamente en un archivo Excel</li>
+                            <li>El archivo tiene un nombre aleatorio para mayor seguridad</li>
+                            <li>Los usuarios NO pueden ver las preguntas de otros</li>
+                            <li>Para descargar todas las preguntas, usa el botón "Descargar Excel"</li>
                         </ul>
                     </div>
                     
                     <div style="text-align: center; margin-top: 30px;">
                         <button class="download-btn" id="downloadExcelBtn">
-                            <i class="fas fa-file-excel"></i> Descargar Archivo Excel con Preguntas
+                            <i class="fas fa-file-excel"></i> Descargar Archivo Excel
                         </button>
                         
-                        <button class="btn" id="clearDataBtn" style="margin-top: 15px; background-color: #dc3545;">
-                            <i class="fas fa-trash-alt"></i> Eliminar Todas las Preguntas
-                        </button>
+                        <div class="test-buttons">
+                            <button class="btn btn-success" id="addTestDataBtn">
+                                <i class="fas fa-plus"></i> Agregar Datos de Prueba
+                            </button>
+                            
+                            <button class="btn btn-danger" id="clearDataBtn">
+                                <i class="fas fa-trash-alt"></i> Limpiar Todo
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="security-note">
                         <i class="fas fa-shield-alt"></i> <strong>Nota de Seguridad:</strong> 
-                        El archivo Excel se genera con un nombre aleatorio (ej: "datos_X8f3zQ.xlsx") para evitar que los usuarios lo encuentren. 
+                        El archivo Excel se genera con un nombre aleatorio (ej: "preguntas_x7f9q2.xlsx") para evitar que los usuarios lo encuentren. 
                         Solo tú puedes acceder a través de este panel con la contraseña correcta.
                     </div>
                 </div>
@@ -496,47 +547,115 @@
         </div>
         
         <div class="footer">
-            <p>© 2026 Sistema de Preguntas Académicas. Todas las preguntas son confidenciales.</p>
+            <p>© 2026 Sistema de Preguntas de Retroalimentación Todas las preguntas son confidenciales.</p>
             <p>Desarrollado por Erik León</p>
         </div>
     </div>
 
     <script>
-        // Variables globales
-        let questions = JSON.parse(localStorage.getItem('academicQuestions')) || [];
-        const ADMIN_PASSWORD = "CortiyDop.129"; // Contraseña para acceder al panel (cámbiala)
-        let excelFileName = localStorage.getItem('excelFileName') || generateRandomFileName();
+        // ============================================
+        // CONFIGURACIÓN Y VARIABLES GLOBALES
+        // ============================================
+        const ADMIN_PASSWORD = "admin123";
+        let questions = [];
+        let excelFileName = "preguntas_seguras.xlsx";
         
-        // Elementos del DOM
+        // ============================================
+        // ELEMENTOS DEL DOM
+        // ============================================
         const questionForm = document.getElementById('questionForm');
         const nameInput = document.getElementById('name');
         const subjectSelect = document.getElementById('subject');
         const questionTextarea = document.getElementById('question');
         const successMessage = document.getElementById('successMessage');
         const errorMessage = document.getElementById('errorMessage');
+        const loadingMessage = document.getElementById('loadingMessage');
         const submitBtn = document.getElementById('submitBtn');
+        
         const toggleAdminPanelBtn = document.getElementById('toggleAdminPanel');
         const adminContent = document.getElementById('adminContent');
         const adminPasswordInput = document.getElementById('adminPassword');
         const accessBtn = document.getElementById('accessBtn');
         const adminDashboard = document.getElementById('adminDashboard');
+        
         const downloadExcelBtn = document.getElementById('downloadExcelBtn');
+        const addTestDataBtn = document.getElementById('addTestDataBtn');
         const clearDataBtn = document.getElementById('clearDataBtn');
+        
         const totalQuestionsEl = document.getElementById('totalQuestions');
         const biologyQuestionsEl = document.getElementById('biologyQuestions');
         const chemistryQuestionsEl = document.getElementById('chemistryQuestions');
         
-        // Generar nombre de archivo aleatorio
-        function generateRandomFileName() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let randomString = '';
-            for (let i = 0; i < 8; i++) {
-                randomString += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return `datos_${randomString}.xlsx`;
+        // ============================================
+        // FUNCIONES DE INICIALIZACIÓN
+        // ============================================
+        function initApp() {
+            loadQuestions();
+            updateStats();
+            
+            // Generar nombre de archivo aleatorio
+            generateRandomFileName();
+            
+            console.log("Aplicación inicializada. Preguntas cargadas:", questions.length);
         }
         
-        // Función para guardar la pregunta
+        function loadQuestions() {
+            const savedQuestions = localStorage.getItem('academicQuestions');
+            if (savedQuestions) {
+                questions = JSON.parse(savedQuestions);
+            } else {
+                questions = [];
+                // Agregar datos de ejemplo si no hay preguntas
+                addExampleQuestions();
+            }
+        }
+        
+        function addExampleQuestions() {
+            const exampleQuestions = [
+                {
+                    id: Date.now() - 86400000,
+                    name: "Ana García",
+                    subject: "BIOLOGÍA",
+                    question: "¿Cuál es la función principal de las mitocondrias en la célula?",
+                    date: new Date().toLocaleDateString('es-ES'),
+                    timestamp: Date.now() - 86400000
+                },
+                {
+                    id: Date.now() - 43200000,
+                    name: "Carlos López",
+                    subject: "QUÍMICA",
+                    question: "¿Cómo se balancea la ecuación HCl + NaOH → NaCl + H2O?",
+                    date: new Date().toLocaleDateString('es-ES'),
+                    timestamp: Date.now() - 43200000
+                },
+                {
+                    id: Date.now() - 21600000,
+                    name: "María Fernández",
+                    subject: "LENGUAJE",
+                    question: "¿Cuál es la diferencia entre metáfora y símil?",
+                    date: new Date().toLocaleDateString('es-ES'),
+                    timestamp: Date.now() - 21600000
+                }
+            ];
+            
+            questions.push(...exampleQuestions);
+            saveQuestionsToStorage();
+            generateExcelFile();
+        }
+        
+        function generateRandomFileName() {
+            const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            let randomPart = '';
+            for (let i = 0; i < 6; i++) {
+                randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            excelFileName = `preguntas_${randomPart}.xlsx`;
+            return excelFileName;
+        }
+        
+        // ============================================
+        // FUNCIONES PRINCIPALES
+        // ============================================
         async function saveQuestion(event) {
             event.preventDefault();
             
@@ -545,11 +664,14 @@
             const subject = subjectSelect.value;
             const question = questionTextarea.value.trim();
             
-            // Validar que todos los campos estén completos
+            // Validar campos
             if (!name || !subject || !question) {
                 showMessage(errorMessage, 'Por favor completa todos los campos del formulario.');
                 return;
             }
+            
+            // Mostrar loading
+            showLoading(true);
             
             // Crear objeto pregunta
             const newQuestion = {
@@ -565,91 +687,71 @@
             questions.push(newQuestion);
             
             // Guardar en localStorage
-            localStorage.setItem('academicQuestions', JSON.stringify(questions));
+            saveQuestionsToStorage();
             
-            // Generar archivo Excel con todas las preguntas
+            // Generar archivo Excel
             await generateExcelFile();
             
             // Mostrar mensaje de éxito
+            showLoading(false);
             showMessage(successMessage, `¡Tu pregunta sobre ${subject} ha sido guardada exitosamente!`);
             
             // Limpiar formulario
             questionForm.reset();
             
-            // Actualizar estadísticas si el panel está visible
-            if (!adminDashboard.classList.contains('hidden')) {
-                updateStats();
-            }
+            // Actualizar estadísticas
+            updateStats();
+            
+            // Log para debugging
+            console.log("Pregunta guardada:", newQuestion);
+            console.log("Total de preguntas:", questions.length);
         }
         
-        // Función para generar archivo Excel
+        function saveQuestionsToStorage() {
+            localStorage.setItem('academicQuestions', JSON.stringify(questions));
+        }
+        
         async function generateExcelFile() {
             try {
+                if (questions.length === 0) return;
+                
                 // Preparar datos para Excel
                 const excelData = questions.map(q => ({
                     "ID": q.id,
                     "Nombre": q.name,
                     "Materia": q.subject,
                     "Pregunta": q.question,
-                    "Fecha": q.date,
-                    "Timestamp": q.timestamp
+                    "Fecha": q.date
                 }));
                 
                 // Crear hoja de trabajo
                 const worksheet = XLSX.utils.json_to_sheet(excelData);
                 
-                // Ajustar anchos de columna
-                const colWidths = [
-                    { wch: 10 }, // ID
-                    { wch: 20 }, // Nombre
-                    { wch: 15 }, // Materia
-                    { wch: 50 }, // Pregunta
-                    { wch: 20 }, // Fecha
-                    { wch: 15 }  // Timestamp
-                ];
-                worksheet['!cols'] = colWidths;
-                
                 // Crear libro de trabajo
                 const workbook = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(workbook, worksheet, "Preguntas");
                 
-                // Generar archivo Excel
-                const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+                // Generar archivo y guardar en localStorage
+                const excelBuffer = XLSX.write(workbook, { 
+                    bookType: 'xlsx', 
+                    type: 'array' 
+                });
                 
-                // Guardar en localStorage como base64 (para persistencia)
-                const base64Data = arrayBufferToBase64(excelBuffer);
+                // Convertir a Base64 para almacenamiento
+                const base64Data = btoa(
+                    new Uint8Array(excelBuffer).reduce(
+                        (data, byte) => data + String.fromCharCode(byte), ''
+                    )
+                );
+                
                 localStorage.setItem('excelData', base64Data);
-                localStorage.setItem('excelFileName', excelFileName);
+                console.log("Archivo Excel generado exitosamente:", excelFileName);
                 
-                console.log(`Archivo Excel generado: ${excelFileName}`);
             } catch (error) {
                 console.error("Error generando Excel:", error);
             }
         }
         
-        // Función para convertir ArrayBuffer a Base64
-        function arrayBufferToBase64(buffer) {
-            let binary = '';
-            const bytes = new Uint8Array(buffer);
-            const len = bytes.byteLength;
-            for (let i = 0; i < len; i++) {
-                binary += String.fromCharCode(bytes[i]);
-            }
-            return window.btoa(binary);
-        }
-        
-        // Función para convertir Base64 a ArrayBuffer
-        function base64ToArrayBuffer(base64) {
-            const binaryString = window.atob(base64);
-            const len = binaryString.length;
-            const bytes = new Uint8Array(len);
-            for (let i = 0; i < len; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-            }
-            return bytes.buffer;
-        }
-        
-        // Función para descargar el archivo Excel
         function downloadExcelFile() {
             if (questions.length === 0) {
                 alert('No hay preguntas para descargar.');
@@ -659,30 +761,33 @@
             try {
                 // Obtener datos de localStorage
                 const base64Data = localStorage.getItem('excelData');
+                
                 if (!base64Data) {
-                    // Si no hay datos guardados, generar el archivo primero
+                    // Si no hay datos, generar el archivo primero
                     generateExcelFile().then(() => {
-                        // Intentar de nuevo después de generar
                         setTimeout(downloadExcelFile, 500);
                     });
                     return;
                 }
                 
                 // Convertir Base64 a ArrayBuffer
-                const arrayBuffer = base64ToArrayBuffer(base64Data);
+                const binaryString = atob(base64Data);
+                const len = binaryString.length;
+                const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
                 
-                // Crear blob
-                const blob = new Blob([arrayBuffer], { 
+                // Crear blob y descargar
+                const blob = new Blob([bytes.buffer], { 
                     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
                 });
                 
-                // Crear enlace para descarga
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = excelFileName; // Nombre de archivo aleatorio
+                link.download = excelFileName;
                 
-                // Simular clic
                 document.body.appendChild(link);
                 link.click();
                 
@@ -692,35 +797,17 @@
                     URL.revokeObjectURL(url);
                 }, 100);
                 
-                // Actualizar nombre del archivo (cada descarga genera nuevo nombre)
-                excelFileName = generateRandomFileName();
-                localStorage.setItem('excelFileName', excelFileName);
+                // Generar nuevo nombre para la próxima descarga
+                generateRandomFileName();
+                
+                alert(`Archivo descargado: ${excelFileName}`);
                 
             } catch (error) {
                 console.error("Error descargando Excel:", error);
-                alert("Error al descargar el archivo. Intenta nuevamente.");
+                alert("Error al descargar. Intenta nuevamente.");
             }
         }
         
-        // Función para mostrar mensajes
-        function showMessage(element, text) {
-            element.innerHTML = `<i class="fas fa-check-circle"></i> ${text}`;
-            element.style.display = 'block';
-            
-            // Ocultar otros mensajes
-            if (element.id === 'successMessage') {
-                errorMessage.style.display = 'none';
-            } else {
-                successMessage.style.display = 'none';
-            }
-            
-            // Ocultar mensaje después de 5 segundos
-            setTimeout(() => {
-                element.style.display = 'none';
-            }, 5000);
-        }
-        
-        // Función para actualizar estadísticas
         function updateStats() {
             totalQuestionsEl.textContent = questions.length;
             
@@ -731,25 +818,55 @@
             biologyQuestionsEl.textContent = biologyCount;
             chemistryQuestionsEl.textContent = chemistryCount;
             
-            // Actualizar también el tercer stat para lenguaje
-            const languageElement = document.querySelector('.stat-card:nth-child(3) .stat-number');
-            if (languageElement) {
-                languageElement.textContent = languageCount;
-                languageElement.parentElement.querySelector('.stat-label').textContent = 'Lenguaje';
+            // Actualizar el tercer stat para lenguaje
+            const statCards = document.querySelectorAll('.stat-card');
+            if (statCards[2]) {
+                const languageNumber = statCards[2].querySelector('.stat-number');
+                const languageLabel = statCards[2].querySelector('.stat-label');
+                if (languageNumber && languageLabel) {
+                    languageNumber.textContent = languageCount;
+                    languageLabel.textContent = 'Lenguaje';
+                }
             }
         }
         
-        // Función para verificar contraseña
+        // ============================================
+        // FUNCIONES DE UTILIDAD
+        // ============================================
+        function showMessage(element, text) {
+            element.innerHTML = `<i class="fas fa-check-circle"></i> ${text}`;
+            element.style.display = 'block';
+            
+            if (element.id === 'successMessage') {
+                errorMessage.style.display = 'none';
+            } else {
+                successMessage.style.display = 'none';
+            }
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showLoading(show) {
+            if (show) {
+                loadingMessage.style.display = 'block';
+                successMessage.style.display = 'none';
+                errorMessage.style.display = 'none';
+                submitBtn.disabled = true;
+            } else {
+                loadingMessage.style.display = 'none';
+                submitBtn.disabled = false;
+            }
+        }
+        
         function checkPassword() {
             const password = adminPasswordInput.value.trim();
             
             if (password === ADMIN_PASSWORD) {
-                // Mostrar dashboard
                 adminDashboard.classList.remove('hidden');
                 adminPasswordInput.value = '';
                 updateStats();
-                
-                // Cambiar texto del botón
                 toggleAdminPanelBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Ocultar Panel';
             } else {
                 alert('Contraseña incorrecta. Intenta nuevamente.');
@@ -758,21 +875,57 @@
             }
         }
         
-        // Función para limpiar todos los datos
+        function addTestData() {
+            const testQuestions = [
+                {
+                    id: Date.now() + 1,
+                    name: "Test Usuario 1",
+                    subject: "BIOLOGÍA",
+                    question: "¿Qué es la fotosíntesis?",
+                    date: new Date().toLocaleString('es-ES'),
+                    timestamp: Date.now() + 1
+                },
+                {
+                    id: Date.now() + 2,
+                    name: "Test Usuario 2",
+                    subject: "QUÍMICA",
+                    question: "¿Qué es una reacción redox?",
+                    date: new Date().toLocaleString('es-ES'),
+                    timestamp: Date.now() + 2
+                },
+                {
+                    id: Date.now() + 3,
+                    name: "Test Usuario 3",
+                    subject: "LENGUAJE",
+                    question: "¿Qué es un sustantivo?",
+                    date: new Date().toLocaleString('es-ES'),
+                    timestamp: Date.now() + 3
+                }
+            ];
+            
+            questions.push(...testQuestions);
+            saveQuestionsToStorage();
+            generateExcelFile();
+            updateStats();
+            
+            alert('3 preguntas de prueba agregadas correctamente.');
+        }
+        
         function clearAllData() {
-            if (confirm('¿Estás seguro de que quieres eliminar TODAS las preguntas? Esta acción no se puede deshacer.')) {
+            if (confirm('¿Estás seguro de eliminar TODAS las preguntas? Esta acción no se puede deshacer.')) {
                 questions = [];
                 localStorage.removeItem('academicQuestions');
                 localStorage.removeItem('excelData');
-                localStorage.removeItem('excelFileName');
-                excelFileName = generateRandomFileName();
+                generateRandomFileName();
                 
-                alert('Todas las preguntas han sido eliminadas.');
                 updateStats();
+                alert('Todas las preguntas han sido eliminadas.');
             }
         }
         
-        // Event Listeners
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
         questionForm.addEventListener('submit', saveQuestion);
         
         toggleAdminPanelBtn.addEventListener('click', () => {
@@ -787,49 +940,18 @@
         });
         
         accessBtn.addEventListener('click', checkPassword);
-        
         adminPasswordInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                checkPassword();
-            }
+            if (e.key === 'Enter') checkPassword();
         });
         
         downloadExcelBtn.addEventListener('click', downloadExcelFile);
-        
+        addTestDataBtn.addEventListener('click', addTestData);
         clearDataBtn.addEventListener('click', clearAllData);
         
-        // Inicializar datos de ejemplo si no hay ninguno
-        document.addEventListener('DOMContentLoaded', () => {
-            // Verificar si hay preguntas guardadas
-            if (questions.length === 0) {
-                // Preguntas de ejemplo para demostración
-                questions = [
-                    {
-                        id: 1,
-                        name: "María González",
-                        subject: "BIOLOGÍA",
-                        question: "¿Cuál es la diferencia entre mitosis y meiosis?",
-                        date: "15/10/2023, 10:30:25",
-                        timestamp: Date.now() - 86400000
-                    },
-                    {
-                        id: 2,
-                        name: "Carlos Ruiz",
-                        subject: "QUÍMICA",
-                        question: "¿Cómo se balancea una ecuación química de combustión?",
-                        date: "14/10/2023, 16:45:12",
-                        timestamp: Date.now() - 172800000
-                    }
-                ];
-                localStorage.setItem('academicQuestions', JSON.stringify(questions));
-                
-                // Generar archivo Excel inicial
-                generateExcelFile();
-            } else {
-                // Si ya hay preguntas, asegurarse de que el archivo Excel esté actualizado
-                generateExcelFile();
-            }
-        });
+        // ============================================
+        // INICIALIZAR APLICACIÓN
+        // ============================================
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
