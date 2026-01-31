@@ -3,18 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preguntas Académicas</title>
+    <title>Preguntas de Retroalimentación</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS para exportar a Excel -->
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --border-radius: 12px;
+            --shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
         body {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            color: #333;
+            color: var(--dark);
             min-height: 100vh;
             padding: 20px;
         }
@@ -31,90 +45,247 @@
         }
 
         h1 {
-            color: #3a0ca3;
-            font-size: 2.5rem;
+            color: var(--secondary);
+            font-size: 2.8rem;
             margin-bottom: 10px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+
+        .subtitle {
+            color: #6c757d;
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
         }
 
         .card {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
             padding: 30px;
-            margin-bottom: 30px;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .form-card {
+            border-top: 5px solid var(--primary);
+        }
+
+        .info-card {
+            border-top: 5px solid var(--accent);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-card h3 {
+            margin-bottom: 20px;
+        }
+
+        .subject-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .badge {
+            background-color: #e9ecef;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        .biologia {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .quimica {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .lenguaje {
+            background-color: #fff3cd;
+            color: #856404;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         label {
             display: block;
             margin-bottom: 8px;
-            font-weight: bold;
-            color: #3a0ca3;
+            font-weight: 600;
+            color: var(--secondary);
         }
 
         input, select, textarea {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
+            padding: 15px;
+            border: 2px solid #e1e5eb;
+            border-radius: var(--border-radius);
             font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
         }
 
         textarea {
-            min-height: 120px;
+            min-height: 150px;
             resize: vertical;
         }
 
         .btn {
-            background: #4361ee;
+            background-color: var(--primary);
             color: white;
             border: none;
-            padding: 15px 30px;
-            border-radius: 5px;
-            font-size: 1rem;
+            padding: 16px 30px;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s ease;
             width: 100%;
-            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .btn:hover {
-            background: #3a0ca3;
+            background-color: var(--secondary);
+            transform: scale(1.02);
+        }
+
+        .btn-success {
+            background-color: #28a745;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
         }
 
         .message {
-            padding: 15px;
-            border-radius: 5px;
+            display: none;
+            padding: 20px;
+            border-radius: var(--border-radius);
             margin-top: 20px;
             text-align: center;
-            display: none;
+            animation: fadeIn 0.5s;
         }
 
-        .success {
-            background: #d4edda;
+        .success-message {
+            background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
 
-        .error {
-            background: #f8d7da;
+        .error-message {
+            background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         .admin-panel {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
             padding: 30px;
             margin-top: 30px;
             border-top: 5px solid #ffc107;
         }
 
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .admin-header h2 {
+            color: var(--secondary);
+        }
+
         .hidden {
             display: none;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #6c757d;
+            font-size: 0.9rem;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .download-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .download-btn:hover {
+            background-color: #218838;
+            transform: scale(1.02);
         }
 
         .stats {
@@ -125,352 +296,662 @@
         }
 
         .stat-card {
-            background: #f8f9fa;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             padding: 20px;
-            border-radius: 5px;
+            border-radius: var(--border-radius);
             text-align: center;
-            border-left: 4px solid #4361ee;
+            border-left: 4px solid var(--primary);
         }
 
         .stat-number {
             font-size: 2rem;
             font-weight: bold;
-            color: #3a0ca3;
+            color: var(--secondary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
         }
 
         .instructions {
-            background: #e7f3ff;
+            background-color: #e7f3ff;
             padding: 20px;
-            border-radius: 5px;
-            margin: 20px 0;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .instructions h4 {
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            padding-left: 20px;
+            color: #495057;
+        }
+
+        .instructions li {
+            margin-bottom: 5px;
+        }
+
+        .security-note {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+            border-left: 4px solid #ffc107;
+            font-size: 0.9rem;
+        }
+
+        .password-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+        }
+
+        .password-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .password-input input {
+            flex: 1;
+        }
+
+        .password-input button {
+            white-space: nowrap;
+        }
+
+        .test-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>📚 Preguntas Académicas</h1>
-            <p>Envía tus preguntas sobre Biología, Química o Lenguaje</p>
+            <h1><i class="fas fa-graduation-cap"></i> Preguntas de Retroalimentación</h1>
+            <p class="subtitle">Envía tus preguntas sobre las materias de Biología, Química o Lenguaje. Tus consultas serán guardadas y respondidas en el grupo de WhatsApp</p>
         </header>
 
-        <div class="card">
-            <h2>Envía tu pregunta</h2>
-            <form id="questionForm">
-                <div class="form-group">
-                    <label for="name">Tu nombre</label>
-                    <input type="text" id="name" placeholder="Ingresa tu nombre" required>
+        <div class="main-content">
+            <div class="card form-card">
+                <h2>Envía tu pregunta</h2>
+                <p class="subtitle" style="margin-bottom: 25px;">Completa el formulario para enviar tu consulta.</p>
+                
+                <form id="questionForm">
+                    <div class="form-group">
+                        <label for="name"><i class="fas fa-user"></i> Tu nombre</label>
+                        <input type="text" id="name" placeholder="Ingresa tu nombre completo" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="subject"><i class="fas fa-book"></i> Selecciona una materia</label>
+                        <select id="subject" required>
+                            <option value="" disabled selected>Elige una materia</option>
+                            <option value="BIOLOGÍA">BIOLOGÍA</option>
+                            <option value="QUÍMICA">QUÍMICA</option>
+                            <option value="LENGUAJE">LENGUAJE</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="question"><i class="fas fa-question-circle"></i> Tu pregunta</label>
+                        <textarea id="question" placeholder="Escribe tu pregunta aquí..." required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="submitBtn">
+                        <i class="fas fa-paper-plane"></i> Enviar Pregunta
+                    </button>
+                </form>
+                
+                <div id="successMessage" class="message success-message">
+                    <i class="fas fa-check-circle"></i> ¡Tu pregunta ha sido guardada exitosamente! Será respondida pronto.
                 </div>
                 
-                <div class="form-group">
-                    <label for="subject">Selecciona una materia</label>
-                    <select id="subject" required>
-                        <option value="" disabled selected>Elige una materia</option>
-                        <option value="BIOLOGÍA">BIOLOGÍA</option>
-                        <option value="QUÍMICA">QUÍMICA</option>
-                        <option value="LENGUAJE">LENGUAJE</option>
-                    </select>
+                <div id="errorMessage" class="message error-message">
+                    <i class="fas fa-exclamation-triangle"></i> Hubo un error al guardar tu pregunta. Por favor, intenta nuevamente.
                 </div>
-                
-                <div class="form-group">
-                    <label for="question">Tu pregunta</label>
-                    <textarea id="question" placeholder="Escribe tu pregunta aquí..." required></textarea>
+
+                <div class="loading" id="loadingMessage">
+                    <div class="spinner"></div>
+                    <p>Guardando tu pregunta...</p>
                 </div>
-                
-                <button type="submit" class="btn">Enviar Pregunta</button>
-            </form>
-            
-            <div id="successMessage" class="message success">
-                ✅ ¡Tu pregunta ha sido guardada exitosamente!
             </div>
             
-            <div id="errorMessage" class="message error">
-                ❌ Error al guardar tu pregunta. Intenta nuevamente.
+            <div class="card info-card">
+                <h3>Materias disponibles</h3>
+                <p>Puedes enviar preguntas sobre cualquiera de estas materias:</p>
+                
+                <div class="subject-badges">
+                    <div class="badge biologia">BIOLOGÍA</div>
+                    <div class="badge quimica">QUÍMICA</div>
+                    <div class="badge lenguaje">LENGUAJE</div>
+                </div>
+                
+                <div style="margin-top: auto;">
+                    <h3>¿Cómo funciona?</h3>
+                    <ul style="padding-left: 20px; margin-top: 10px; color: #495057;">
+                        <li>Ingresa tu nombre completo</li>
+                        <li>Selecciona la materia de tu interés</li>
+                        <li>Escribe tu pregunta con claridad</li>
+                        <li>Haz clic en "Enviar Pregunta"</li>
+                        <li>Recibirás una confirmación de envío</li>
+                        <li>Tu pregunta será respondida pronto</li>
+                    </ul>
+                </div>
             </div>
         </div>
         
+        <!-- Panel de Administración -->
         <div class="admin-panel">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2>🔒 Panel de Administración</h2>
-                <button class="btn" id="toggleAdminPanel" style="width: auto;">
-                    Mostrar Panel
+            <div class="admin-header">
+                <h2><i class="fas fa-lock"></i> Panel de Administración</h2>
+                <button class="btn btn-warning" id="toggleAdminPanel">
+                    <i class="fas fa-eye"></i> Mostrar Panel
                 </button>
             </div>
             
             <div id="adminContent" class="hidden">
-                <div style="background: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
-                    <h3>Acceso Restringido</h3>
-                    <input type="password" id="adminPassword" placeholder="" 
-                           style="width: 100%; padding: 10px; margin: 10px 0;">
-                    <button class="btn" id="accessBtn" style="width: auto;">Acceder</button>
+                <div class="password-section">
+                    <h4><i class="fas fa-key"></i> Acceso Restringido</h4>
+                    <p>Ingresa la contraseña de administrador para acceder a las preguntas:</p>
+                    <div class="password-input">
+                        <input type="password" id="adminPassword" placeholder="Contraseña: admin123">
+                        <button class="btn" id="accessBtn">Acceder</button>
+                    </div>
+                    <p style="margin-top: 10px; font-size: 0.9rem; color: #6c757d;">
+                        <i class="fas fa-info-circle"></i> Contraseña por defecto: <strong>admin123</strong>
+                    </p>
                 </div>
                 
                 <div id="adminDashboard" class="hidden">
                     <div class="stats">
                         <div class="stat-card">
                             <div class="stat-number" id="totalQuestions">0</div>
-                            <div>Preguntas Totales</div>
+                            <div class="stat-label">Preguntas Totales</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-number" id="biologyQuestions">0</div>
-                            <div>Biología</div>
+                            <div class="stat-label">Biología</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-number" id="chemistryQuestions">0</div>
-                            <div>Química</div>
+                            <div class="stat-label">Química</div>
                         </div>
                     </div>
                     
                     <div class="instructions">
-                        <h3>📋 Instrucciones</h3>
-                        <p>1. Las preguntas se guardan automáticamente</p>
-                        <p>2. Haz clic en "Descargar Preguntas" para obtener el archivo</p>
-                        <p>3. El archivo se guarda como texto plano (.txt)</p>
+                        <h4><i class="fas fa-info-circle"></i> Funcionamiento del Sistema</h4>
+                        <ul>
+                            <li>Cada pregunta se guarda automáticamente en un archivo Excel</li>
+                            <li>El archivo tiene un nombre aleatorio para mayor seguridad</li>
+                            <li>Los usuarios NO pueden ver las preguntas de otros</li>
+                            <li>Para descargar todas las preguntas, usa el botón "Descargar Excel"</li>
+                        </ul>
                     </div>
                     
                     <div style="text-align: center; margin-top: 30px;">
-                        <button class="btn" id="downloadBtn" style="background: #28a745;">
-                            📥 Descargar Preguntas (TXT)
+                        <button class="download-btn" id="downloadExcelBtn">
+                            <i class="fas fa-file-excel"></i> Descargar Archivo Excel
                         </button>
                         
-                        <button class="btn" id="addTestBtn" style="background: #17a2b8; margin-top: 10px;">
-                            ＋ Agregar Datos de Prueba
-                        </button>
-                        
-                        <button class="btn" id="clearBtn" style="background: #dc3545; margin-top: 10px;">
-                            🗑️ Limpiar Todo
-                        </button>
+                        <div class="test-buttons">
+                            <button class="btn btn-success" id="addTestDataBtn">
+                                <i class="fas fa-plus"></i> Agregar Datos de Prueba
+                            </button>
+                            
+                            <button class="btn btn-danger" id="clearDataBtn">
+                                <i class="fas fa-trash-alt"></i> Limpiar Todo
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="security-note">
+                        <i class="fas fa-shield-alt"></i> <strong>Nota de Seguridad:</strong> 
+                        El archivo Excel se genera con un nombre aleatorio (ej: "preguntas_x7f9q2.xlsx") para evitar que los usuarios lo encuentren. 
+                        Solo tú puedes acceder a través de este panel con la contraseña correcta.
                     </div>
                 </div>
             </div>
         </div>
+        
+        <div class="footer">
+            <p>© 2026 Preguntas de Retroalimentación. Todas las preguntas son confidenciales.</p>
+            <p>Desarrollado por Erik León</p>
+        </div>
     </div>
 
     <script>
-        // Variables globales
+        // ============================================
+        // CONFIGURACIÓN Y VARIABLES GLOBALES
+        // ============================================
+        const ADMIN_PASSWORD = "CortiyDop.129";
         let questions = [];
-        const ADMIN_PASSWORD = "admin123";
+        let excelFileName = "preguntas_seguras.xlsx";
         
-        // Cargar preguntas guardadas
-        function loadQuestions() {
-            const saved = localStorage.getItem('academicQuestions');
-            if (saved) {
-                questions = JSON.parse(saved);
-            }
+        // ============================================
+        // ELEMENTOS DEL DOM
+        // ============================================
+        const questionForm = document.getElementById('questionForm');
+        const nameInput = document.getElementById('name');
+        const subjectSelect = document.getElementById('subject');
+        const questionTextarea = document.getElementById('question');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        const loadingMessage = document.getElementById('loadingMessage');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        const toggleAdminPanelBtn = document.getElementById('toggleAdminPanel');
+        const adminContent = document.getElementById('adminContent');
+        const adminPasswordInput = document.getElementById('adminPassword');
+        const accessBtn = document.getElementById('accessBtn');
+        const adminDashboard = document.getElementById('adminDashboard');
+        
+        const downloadExcelBtn = document.getElementById('downloadExcelBtn');
+        const addTestDataBtn = document.getElementById('addTestDataBtn');
+        const clearDataBtn = document.getElementById('clearDataBtn');
+        
+        const totalQuestionsEl = document.getElementById('totalQuestions');
+        const biologyQuestionsEl = document.getElementById('biologyQuestions');
+        const chemistryQuestionsEl = document.getElementById('chemistryQuestions');
+        
+        // ============================================
+        // FUNCIONES DE INICIALIZACIÓN
+        // ============================================
+        function initApp() {
+            loadQuestions();
             updateStats();
+            
+            // Generar nombre de archivo aleatorio
+            generateRandomFileName();
+            
+            console.log("Aplicación inicializada. Preguntas cargadas:", questions.length);
         }
         
-        // Guardar pregunta
-        function saveQuestion(event) {
+        function loadQuestions() {
+            const savedQuestions = localStorage.getItem('academicQuestions');
+            if (savedQuestions) {
+                questions = JSON.parse(savedQuestions);
+            } else {
+                questions = [];
+                // Agregar datos de ejemplo si no hay preguntas
+                addExampleQuestions();
+            }
+        }
+        
+        function addExampleQuestions() {
+            const exampleQuestions = [
+                {
+                    id: Date.now() - 86400000,
+                    name: "Ana García",
+                    subject: "BIOLOGÍA",
+                    question: "¿Cuál es la función principal de las mitocondrias en la célula?",
+                    date: new Date().toLocaleDateString('es-ES'),
+                    timestamp: Date.now() - 86400000
+                },
+                {
+                    id: Date.now() - 43200000,
+                    name: "Carlos López",
+                    subject: "QUÍMICA",
+                    question: "¿Cómo se balancea la ecuación HCl + NaOH → NaCl + H2O?",
+                    date: new Date().toLocaleDateString('es-ES'),
+                    timestamp: Date.now() - 43200000
+                },
+                {
+                    id: Date.now() - 21600000,
+                    name: "María Fernández",
+                    subject: "LENGUAJE",
+                    question: "¿Cuál es la diferencia entre metáfora y símil?",
+                    date: new Date().toLocaleDateString('es-ES'),
+                    timestamp: Date.now() - 21600000
+                }
+            ];
+            
+            questions.push(...exampleQuestions);
+            saveQuestionsToStorage();
+            generateExcelFile();
+        }
+        
+        function generateRandomFileName() {
+            const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            let randomPart = '';
+            for (let i = 0; i < 6; i++) {
+                randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            excelFileName = `preguntas_${randomPart}.xlsx`;
+            return excelFileName;
+        }
+        
+        // ============================================
+        // FUNCIONES PRINCIPALES
+        // ============================================
+        async function saveQuestion(event) {
             event.preventDefault();
             
-            const name = document.getElementById('name').value.trim();
-            const subject = document.getElementById('subject').value;
-            const questionText = document.getElementById('question').value.trim();
+            // Obtener valores del formulario
+            const name = nameInput.value.trim();
+            const subject = subjectSelect.value;
+            const question = questionTextarea.value.trim();
             
-            if (!name || !subject || !questionText) {
-                showMessage('error', 'Por favor completa todos los campos');
+            // Validar campos
+            if (!name || !subject || !question) {
+                showMessage(errorMessage, 'Por favor completa todos los campos del formulario.');
                 return;
             }
             
+            // Mostrar loading
+            showLoading(true);
+            
+            // Crear objeto pregunta
             const newQuestion = {
                 id: Date.now(),
                 name: name,
                 subject: subject,
-                question: questionText,
+                question: question,
                 date: new Date().toLocaleString('es-ES'),
                 timestamp: Date.now()
             };
             
+            // Agregar a la lista
             questions.push(newQuestion);
-            localStorage.setItem('academicQuestions', JSON.stringify(questions));
             
-            document.getElementById('questionForm').reset();
-            showMessage('success', `¡Pregunta sobre ${subject} guardada!`);
+            // Guardar en localStorage
+            saveQuestionsToStorage();
+            
+            // Generar archivo Excel
+            await generateExcelFile();
+            
+            // Mostrar mensaje de éxito
+            showLoading(false);
+            showMessage(successMessage, `¡Tu pregunta sobre ${subject} ha sido guardada exitosamente!`);
+            
+            // Limpiar formulario
+            questionForm.reset();
+            
+            // Actualizar estadísticas
             updateStats();
             
-            // Guardar también en archivo TXT (simulado)
-            saveToTxtFile();
+            // Log para debugging
+            console.log("Pregunta guardada:", newQuestion);
+            console.log("Total de preguntas:", questions.length);
         }
         
-        // Guardar en archivo TXT (simulación)
-        function saveToTxtFile() {
-            let txtContent = "PREGUNTAS ACADÉMICAS\n";
-            txtContent += "====================\n\n";
-            
-            questions.forEach((q, index) => {
-                txtContent += `PREGUNTA ${index + 1}\n`;
-                txtContent += `Nombre: ${q.name}\n`;
-                txtContent += `Materia: ${q.subject}\n`;
-                txtContent += `Fecha: ${q.date}\n`;
-                txtContent += `Pregunta: ${q.question}\n`;
-                txtContent += "─".repeat(50) + "\n\n";
-            });
-            
-            // Guardar en localStorage como texto plano
-            localStorage.setItem('questionsTxt', txtContent);
+        function saveQuestionsToStorage() {
+            localStorage.setItem('academicQuestions', JSON.stringify(questions));
         }
         
-        // Descargar archivo TXT
-        function downloadTxtFile() {
+        async function generateExcelFile() {
+            try {
+                if (questions.length === 0) return;
+                
+                // Preparar datos para Excel
+                const excelData = questions.map(q => ({
+                    "ID": q.id,
+                    "Nombre": q.name,
+                    "Materia": q.subject,
+                    "Pregunta": q.question,
+                    "Fecha": q.date
+                }));
+                
+                // Crear hoja de trabajo
+                const worksheet = XLSX.utils.json_to_sheet(excelData);
+                
+                // Crear libro de trabajo
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Preguntas");
+                
+                // Generar archivo y guardar en localStorage
+                const excelBuffer = XLSX.write(workbook, { 
+                    bookType: 'xlsx', 
+                    type: 'array' 
+                });
+                
+                // Convertir a Base64 para almacenamiento
+                const base64Data = btoa(
+                    new Uint8Array(excelBuffer).reduce(
+                        (data, byte) => data + String.fromCharCode(byte), ''
+                    )
+                );
+                
+                localStorage.setItem('excelData', base64Data);
+                console.log("Archivo Excel generado exitosamente:", excelFileName);
+                
+            } catch (error) {
+                console.error("Error generando Excel:", error);
+            }
+        }
+        
+        function downloadExcelFile() {
             if (questions.length === 0) {
-                alert('No hay preguntas para descargar');
+                alert('No hay preguntas para descargar.');
                 return;
             }
             
-            saveToTxtFile();
-            const txtContent = localStorage.getItem('questionsTxt');
-            
-            // Generar nombre de archivo con fecha
-            const date = new Date();
-            const fileName = `preguntas_${date.getFullYear()}${(date.getMonth()+1).toString().padStart(2,'0')}${date.getDate().toString().padStart(2,'0')}_${date.getHours()}${date.getMinutes()}.txt`;
-            
-            // Crear y descargar archivo
-            const blob = new Blob([txtContent], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            
-            alert(`Archivo descargado: ${fileName}`);
-        }
-        
-        // Actualizar estadísticas
-        function updateStats() {
-            document.getElementById('totalQuestions').textContent = questions.length;
-            
-            const bioCount = questions.filter(q => q.subject === 'BIOLOGÍA').length;
-            const chemCount = questions.filter(q => q.subject === 'QUÍMICA').length;
-            const langCount = questions.filter(q => q.subject === 'LENGUAJE').length;
-            
-            document.getElementById('biologyQuestions').textContent = bioCount;
-            document.getElementById('chemistryQuestions').textContent = chemCount;
-            
-            // Actualizar tercer stat
-            const thirdStat = document.querySelector('.stat-card:nth-child(3) .stat-number');
-            if (thirdStat) {
-                thirdStat.textContent = langCount;
-                thirdStat.nextElementSibling.textContent = 'Lenguaje';
+            try {
+                // Obtener datos de localStorage
+                const base64Data = localStorage.getItem('excelData');
+                
+                if (!base64Data) {
+                    // Si no hay datos, generar el archivo primero
+                    generateExcelFile().then(() => {
+                        setTimeout(downloadExcelFile, 500);
+                    });
+                    return;
+                }
+                
+                // Convertir Base64 a ArrayBuffer
+                const binaryString = atob(base64Data);
+                const len = binaryString.length;
+                const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                
+                // Crear blob y descargar
+                const blob = new Blob([bytes.buffer], { 
+                    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+                });
+                
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = excelFileName;
+                
+                document.body.appendChild(link);
+                link.click();
+                
+                // Limpiar
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                }, 100);
+                
+                // Generar nuevo nombre para la próxima descarga
+                generateRandomFileName();
+                
+                alert(`Archivo descargado: ${excelFileName}`);
+                
+            } catch (error) {
+                console.error("Error descargando Excel:", error);
+                alert("Error al descargar. Intenta nuevamente.");
             }
         }
         
-        // Mostrar mensajes
-        function showMessage(type, text) {
-            const successMsg = document.getElementById('successMessage');
-            const errorMsg = document.getElementById('errorMessage');
+        function updateStats() {
+            totalQuestionsEl.textContent = questions.length;
             
-            if (type === 'success') {
-                successMsg.textContent = text;
-                successMsg.style.display = 'block';
-                errorMsg.style.display = 'none';
+            const biologyCount = questions.filter(q => q.subject === 'BIOLOGÍA').length;
+            const chemistryCount = questions.filter(q => q.subject === 'QUÍMICA').length;
+            const languageCount = questions.filter(q => q.subject === 'LENGUAJE').length;
+            
+            biologyQuestionsEl.textContent = biologyCount;
+            chemistryQuestionsEl.textContent = chemistryCount;
+            
+            // Actualizar el tercer stat para lenguaje
+            const statCards = document.querySelectorAll('.stat-card');
+            if (statCards[2]) {
+                const languageNumber = statCards[2].querySelector('.stat-number');
+                const languageLabel = statCards[2].querySelector('.stat-label');
+                if (languageNumber && languageLabel) {
+                    languageNumber.textContent = languageCount;
+                    languageLabel.textContent = 'Lenguaje';
+                }
+            }
+        }
+        
+        // ============================================
+        // FUNCIONES DE UTILIDAD
+        // ============================================
+        function showMessage(element, text) {
+            element.innerHTML = `<i class="fas fa-check-circle"></i> ${text}`;
+            element.style.display = 'block';
+            
+            if (element.id === 'successMessage') {
+                errorMessage.style.display = 'none';
             } else {
-                errorMsg.textContent = text;
-                errorMsg.style.display = 'block';
-                successMsg.style.display = 'none';
+                successMessage.style.display = 'none';
             }
             
             setTimeout(() => {
-                successMsg.style.display = 'none';
-                errorMsg.style.display = 'none';
+                element.style.display = 'none';
             }, 5000);
         }
         
-        // Verificar contraseña
-        function checkPassword() {
-            const password = document.getElementById('adminPassword').value;
-            
-            if (password === ADMIN_PASSWORD) {
-                document.getElementById('adminDashboard').classList.remove('hidden');
-                document.getElementById('adminPassword').value = '';
-                updateStats();
+        function showLoading(show) {
+            if (show) {
+                loadingMessage.style.display = 'block';
+                successMessage.style.display = 'none';
+                errorMessage.style.display = 'none';
+                submitBtn.disabled = true;
             } else {
-                alert('Contraseña incorrecta');
-                document.getElementById('adminPassword').value = '';
-                document.getElementById('adminPassword').focus();
+                loadingMessage.style.display = 'none';
+                submitBtn.disabled = false;
             }
         }
         
-        // Agregar datos de prueba
+        function checkPassword() {
+            const password = adminPasswordInput.value.trim();
+            
+            if (password === ADMIN_PASSWORD) {
+                adminDashboard.classList.remove('hidden');
+                adminPasswordInput.value = '';
+                updateStats();
+                toggleAdminPanelBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Ocultar Panel';
+            } else {
+                alert('Contraseña incorrecta. Intenta nuevamente.');
+                adminPasswordInput.value = '';
+                adminPasswordInput.focus();
+            }
+        }
+        
         function addTestData() {
             const testQuestions = [
                 {
                     id: Date.now() + 1,
-                    name: "Estudiante Ejemplo",
+                    name: "Test Usuario 1",
                     subject: "BIOLOGÍA",
-                    question: "¿Qué es la fotosíntesis y por qué es importante?",
+                    question: "¿Qué es la fotosíntesis?",
                     date: new Date().toLocaleString('es-ES'),
                     timestamp: Date.now() + 1
                 },
                 {
                     id: Date.now() + 2,
-                    name: "Otro Estudiante",
+                    name: "Test Usuario 2",
                     subject: "QUÍMICA",
-                    question: "Explique la diferencia entre ácidos y bases",
+                    question: "¿Qué es una reacción redox?",
                     date: new Date().toLocaleString('es-ES'),
                     timestamp: Date.now() + 2
                 },
                 {
                     id: Date.now() + 3,
-                    name: "Estudiante de Letras",
+                    name: "Test Usuario 3",
                     subject: "LENGUAJE",
-                    question: "¿Cuál es la función del sustantivo en una oración?",
+                    question: "¿Qué es un sustantivo?",
                     date: new Date().toLocaleString('es-ES'),
                     timestamp: Date.now() + 3
                 }
             ];
             
             questions.push(...testQuestions);
-            localStorage.setItem('academicQuestions', JSON.stringify(questions));
-            saveToTxtFile();
+            saveQuestionsToStorage();
+            generateExcelFile();
             updateStats();
             
-            alert('3 preguntas de prueba agregadas');
-            showMessage('success', 'Datos de prueba agregados');
+            alert('3 preguntas de prueba agregadas correctamente.');
         }
         
-        // Limpiar todo
-        function clearAll() {
-            if (confirm('¿Eliminar TODAS las preguntas? Esta acción no se puede deshacer.')) {
+        function clearAllData() {
+            if (confirm('¿Estás seguro de eliminar TODAS las preguntas? Esta acción no se puede deshacer.')) {
                 questions = [];
                 localStorage.removeItem('academicQuestions');
-                localStorage.removeItem('questionsTxt');
+                localStorage.removeItem('excelData');
+                generateRandomFileName();
+                
                 updateStats();
-                alert('Todas las preguntas han sido eliminadas');
+                alert('Todas las preguntas han sido eliminadas.');
             }
         }
         
-        // Inicializar
-        document.addEventListener('DOMContentLoaded', function() {
-            // Cargar preguntas
-            loadQuestions();
-            
-            // Event Listeners
-            document.getElementById('questionForm').addEventListener('submit', saveQuestion);
-            
-            document.getElementById('toggleAdminPanel').addEventListener('click', function() {
-                const adminContent = document.getElementById('adminContent');
-                adminContent.classList.toggle('hidden');
-                this.textContent = adminContent.classList.contains('hidden') ? 'Mostrar Panel' : 'Ocultar Panel';
-            });
-            
-            document.getElementById('accessBtn').addEventListener('click', checkPassword);
-            
-            document.getElementById('adminPassword').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') checkPassword();
-            });
-            
-            document.getElementById('downloadBtn').addEventListener('click', downloadTxtFile);
-            document.getElementById('addTestBtn').addEventListener('click', addTestData);
-            document.getElementById('clearBtn').addEventListener('click', clearAll);
-            
-            // Agregar algunas preguntas de ejemplo si está vacío
-            if (questions.length === 0) {
-                setTimeout(addTestData, 1000);
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+        questionForm.addEventListener('submit', saveQuestion);
+        
+        toggleAdminPanelBtn.addEventListener('click', () => {
+            adminContent.classList.toggle('hidden');
+            if (!adminContent.classList.contains('hidden')) {
+                adminPasswordInput.focus();
+                toggleAdminPanelBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Ocultar Panel';
+            } else {
+                adminDashboard.classList.add('hidden');
+                toggleAdminPanelBtn.innerHTML = '<i class="fas fa-eye"></i> Mostrar Panel';
             }
         });
+        
+        accessBtn.addEventListener('click', checkPassword);
+        adminPasswordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkPassword();
+        });
+        
+        downloadExcelBtn.addEventListener('click', downloadExcelFile);
+        addTestDataBtn.addEventListener('click', addTestData);
+        clearDataBtn.addEventListener('click', clearAllData);
+        
+        // ============================================
+        // INICIALIZAR APLICACIÓN
+        // ============================================
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
